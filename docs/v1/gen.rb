@@ -35,7 +35,7 @@ def parse_router_entry filename
 end
 
 def parse_req_res filename, code, handler, schema
-  relpath = code.match(/import.*\b#{handler}\b.*from\s*['"]([^'"]+)/)[1]
+  relpath = code.match(/import.*\b#{handler}\b.*from\s*['"]([^'"]+)/m)[1]
   path = File.expand_path relpath, File.dirname(filename)
   if File.exist? "#{path}.ts"
     path = "#{path}.ts"
@@ -69,10 +69,12 @@ end
 def parse_res filename, code
   offset = 0
   res = []
-  while (i = code.index 'reply.send({', offset)
-    i += 'reply.send('.size
-    j = code.index '})', i
-    res.push dedent code[i..j]
+  while (i = code.index 'return {', offset)
+    nl = code.rindex ?\n, i
+    indent = code[nl + 1..][/^[ ]+/]
+    i += 'return '.size
+    j = code.index /^#{indent}\}\;/, i
+    res.push dedent code[i..j + indent.size]
     offset = j + 1
   end
   res
@@ -90,9 +92,8 @@ def indent code, prefix='  '
 end
 
 def render_doc
-  puts "```"
   @routes.each do |meth, path, handler, auth, schema, req, res, filename|
-    puts "#{meth} #{path} (#{handler})#{auth ? ' [auth]' : ''}"
+    puts "```\n#{meth} #{path} (#{handler})#{auth ? ' [auth]' : ''}"
     %i(params query body).each do |key|
       if req[key]
         puts "#{key}:", indent(req[key])
@@ -102,9 +103,8 @@ def render_doc
     res.uniq.each do |e|
       puts indent e
     end
-    puts
+    puts "```"
   end
-  puts "```"
 end
 
 main if __FILE__ == $0
