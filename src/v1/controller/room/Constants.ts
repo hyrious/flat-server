@@ -5,8 +5,8 @@ export enum RoomType {
 }
 
 export enum DocsType {
-    Dynamic = "Dynamic",
-    Static = "Static",
+    Dynamic = "dynamic",
+    Static = "static",
 }
 
 export enum Week {

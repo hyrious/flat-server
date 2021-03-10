@@ -1,6 +1,6 @@
 export enum ConvertStep {
-    Pending,
-    Converting,
-    Done,
-    Failed,
+    Pending = "pending",
+    Converting = "converting",
+    Done = "done",
+    Failed = "failed",
 }
