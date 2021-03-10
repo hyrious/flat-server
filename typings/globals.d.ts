@@ -21,6 +21,9 @@ declare namespace NodeJS {
         AGORA_OSS_FOLDER: string;
         AGORA_OSS_PREFIX: string;
 
+        OSS_ACCESS_KEY_ID: string;
+        OSS_ACCESS_KEY_SECRET: string;
+
         REDIS_HOST: string;
         REDIS_PORT: string;
         REDIS_PASSWORD: string;
