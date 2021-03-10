@@ -4,7 +4,7 @@ import { ErrorCode } from "../../../../ErrorCode";
 import { CloudStorageConfigsModel } from "../../../model/cloudStorage/CloudStorageConfigs";
 import { CloudStorageFilesModel } from "../../../model/cloudStorage/CloudStorageFiles";
 import { CloudStorageUserFilesModel } from "../../../model/cloudStorage/CloudStorageUserFiles";
-import { PatchRequest, Response } from "../../../types/Server";
+import { FastifySchema, PatchRequest, Response } from "../../../types/Server";
 import { ConvertStep } from "../Constants";
 
 export const list = async (
@@ -72,6 +72,28 @@ interface ListQuery {
     page: number;
     is_delete?: number;
 }
+
+export const listSchemaType: FastifySchema<{
+    querystring: ListQuery;
+}> = {
+    querystring: {
+        type: "object",
+        required: ["page"],
+        properties: {
+            page: {
+                type: "integer",
+                maximum: 50,
+                minimum: 1,
+            },
+            is_delete: {
+                type: "integer",
+                maximum: 1,
+                minimum: 0,
+                nullable: true,
+            },
+        },
+    },
+};
 
 type ListResponse = Array<{
     fileUUID: string;
