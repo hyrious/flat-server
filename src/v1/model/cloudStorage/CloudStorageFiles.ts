@@ -1,5 +1,6 @@
 import { Column, Entity, Index } from "typeorm";
 import { Content } from "../Content";
+import { ConvertStep } from "../../controller/cloudStorage/Constants";
 
 @Entity({
     name: "cloud_storage_files",
@@ -14,7 +15,7 @@ export class CloudStorageFilesModel extends Content {
     file_uuid: string;
 
     @Column({
-        length: 40,
+        length: 128,
         comment: "file name",
     })
     file_name: string;
@@ -25,4 +26,41 @@ export class CloudStorageFilesModel extends Content {
         comment: "file size (bytes)",
     })
     file_size: number;
+
+    @Column({
+        length: 256,
+        comment: "file url in oss cdn",
+    })
+    file_url: string;
+
+    @Column({
+        type: "json",
+        comment: "convert result or null",
+    })
+    file_urls: string;
+
+    @Column({
+        type: "enum",
+        enum: [ConvertStep.Pending, ConvertStep.Converting, ConvertStep.Done, ConvertStep.Failed],
+        default: ConvertStep.Pending,
+    })
+    convert_step: ConvertStep;
+
+    @Column({
+        length: 40,
+        comment: "netless conversion task uuid v1",
+    })
+    task_uuid: string;
+
+    @Column({
+        length: 256,
+        comment: "generated from sdk token and task uuid",
+    })
+    task_token: string;
+
+    @Index("cloud_storage_files_is_delete_index")
+    @Column({
+        default: false,
+    })
+    is_delete: boolean;
 }
