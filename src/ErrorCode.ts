@@ -21,4 +21,6 @@ export enum ErrorCode {
     UserNotFound = 400000, // user not found
 
     RecordNotFound = 500000, // record info not found
+
+    FileNotFound = 600000, // file info not found
 }
