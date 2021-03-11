@@ -106,7 +106,7 @@ export const listSchemaType: FastifySchema<{
     },
 };
 
-type ListResponse = {
+interface ListResponse {
     totalUsage: string;
     files: Array<{
         fileUUID: string;
@@ -118,7 +118,7 @@ type ListResponse = {
         taskUUID: string;
         taskToken: string;
     }>;
-};
+}
 
 interface File {
     file_uuid: string;
