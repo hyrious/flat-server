@@ -55,7 +55,6 @@ export const list = async (
                 fileUUID: file.file_uuid,
                 fileName: file.file_name,
                 fileSize: file.file_size,
-                totalUsage: file.total_usage,
                 fileUrl: file.file_url,
                 fileUrls: file.file_urls ? JSON.parse(file.file_urls) : [],
                 convertStep: file.convert_step,
@@ -118,7 +117,6 @@ type ListResponse = {
         convertStep: ConvertStep;
         taskUUID: string;
         taskToken: string;
-        totalUsage: string;
     }>;
 };
 
@@ -131,5 +129,4 @@ interface File {
     convert_step: ConvertStep;
     task_uuid: string;
     task_token: string;
-    total_usage: string;
 }
