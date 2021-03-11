@@ -1,7 +1,7 @@
 import { createQueryBuilder } from "typeorm";
 import { Status } from "../../../../Constants";
 import { ErrorCode } from "../../../../ErrorCode";
-import { CloudStorageConfigsModel } from "../../../model/cloudStorage/CloudStorageConfigs";
+import { CloudStorageUserDAO } from "../../../dao";
 import { CloudStorageFilesModel } from "../../../model/cloudStorage/CloudStorageFiles";
 import { CloudStorageUserFilesModel } from "../../../model/cloudStorage/CloudStorageUserFiles";
 import { FastifySchema, PatchRequest, Response } from "../../../types/Server";
@@ -15,6 +15,17 @@ export const list = async (
     const is_delete = Boolean(req.query.is_delete).toString();
 
     try {
+        const userInfo = await CloudStorageUserDAO().findOne(["total_usage"], {
+            user_uuid: req.user.userUUID,
+        });
+
+        if (userInfo === undefined) {
+            return {
+                status: Status.Success,
+                data: { totalUsage: "0", files: [] },
+            };
+        }
+
         const queryBuilder = createQueryBuilder(CloudStorageUserFilesModel, "fc")
             .addSelect("f.file_uuid", "file_uuid")
             .addSelect("f.file_name", "file_name")
@@ -24,9 +35,7 @@ export const list = async (
             .addSelect("f.convert_step", "convert_step")
             .addSelect("f.task_uuid", "task_uuid")
             .addSelect("f.task_token", "task_token")
-            .addSelect("c.total_usage", "total_usage")
             .innerJoin(CloudStorageFilesModel, "f", "fc.file_uuid = c.file_uuid")
-            .innerJoin(CloudStorageConfigsModel, "c", "fc.user_uuid = u.user_uuid")
             .where(
                 `fc.user_uuid = :userUUID
                 AND fc.is_delete = :isDelete
@@ -57,7 +66,10 @@ export const list = async (
 
         return {
             status: Status.Success,
-            data: resp,
+            data: {
+                totalUsage: userInfo.total_usage,
+                files: resp,
+            },
         };
     } catch (e) {
         console.error(e);
@@ -95,17 +107,20 @@ export const listSchemaType: FastifySchema<{
     },
 };
 
-type ListResponse = Array<{
-    fileUUID: string;
-    fileName: string;
-    fileSize: number;
-    fileUrl: string;
-    fileUrls: string[];
-    convertStep: ConvertStep;
-    taskUUID: string;
-    taskToken: string;
+type ListResponse = {
     totalUsage: string;
-}>;
+    files: Array<{
+        fileUUID: string;
+        fileName: string;
+        fileSize: number;
+        fileUrl: string;
+        fileUrls: string[];
+        convertStep: ConvertStep;
+        taskUUID: string;
+        taskToken: string;
+        totalUsage: string;
+    }>;
+};
 
 interface File {
     file_uuid: string;
