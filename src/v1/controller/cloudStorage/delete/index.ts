@@ -7,7 +7,7 @@ import { FastifySchema, PatchRequest, Response } from "../../../types/Server";
 export const deleteFile = async (
     req: PatchRequest<{ Body: DeleteFileBody }>,
 ): Response<DeleteFileResponse> => {
-    const { fileUUID } = req.body;
+    const { fileUUID, force } = req.body;
     const { userUUID } = req.user;
 
     try {
@@ -50,29 +50,56 @@ export const deleteFile = async (
         await getConnection().transaction(async t => {
             const commands: Promise<unknown>[] = [];
 
-            commands.push(
-                CloudStorageUserDAO(t).update(
-                    {
-                        total_usage: totalUsage.toString(),
-                    },
-                    {
+            if (force) {
+                // TODO: tell oss to really delete files
+
+                commands.push(
+                    CloudStorageUserDAO(t).update(
+                        {
+                            total_usage: totalUsage.toString(),
+                        },
+                        {
+                            user_uuid: userUUID,
+                        },
+                    ),
+                );
+
+                commands.push(
+                    CloudStorageUserFilesDAO(t).remove({
+                        file_uuid: fileUUID,
                         user_uuid: userUUID,
-                    },
-                ),
-            );
+                    }),
+                );
 
-            commands.push(
-                CloudStorageUserFilesDAO(t).remove({
-                    file_uuid: fileUUID,
-                    user_uuid: userUUID,
-                }),
-            );
+                commands.push(
+                    CloudStorageFilesDAO(t).remove({
+                        file_uuid: fileUUID,
+                    }),
+                );
+            } else {
+                commands.push(
+                    CloudStorageUserFilesDAO(t).update(
+                        {
+                            is_delete: true,
+                        },
+                        {
+                            file_uuid: fileUUID,
+                            user_uuid: userUUID,
+                        },
+                    ),
+                );
 
-            commands.push(
-                CloudStorageFilesDAO(t).remove({
-                    file_uuid: fileUUID,
-                }),
-            );
+                commands.push(
+                    CloudStorageFilesDAO(t).update(
+                        {
+                            is_delete: true,
+                        },
+                        {
+                            file_uuid: fileUUID,
+                        },
+                    ),
+                );
+            }
 
             await Promise.all(commands);
         });
@@ -92,6 +119,7 @@ export const deleteFile = async (
 
 interface DeleteFileBody {
     fileUUID: string;
+    force?: boolean;
 }
 
 export const deleteFileSchemaType: FastifySchema<{
@@ -104,6 +132,10 @@ export const deleteFileSchemaType: FastifySchema<{
             fileUUID: {
                 type: "string",
                 format: "uuid-v4",
+            },
+            force: {
+                type: "boolean",
+                nullable: true,
             },
         },
     },
