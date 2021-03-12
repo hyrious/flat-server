@@ -76,7 +76,7 @@ interface CreateStaticConversionTaskParams {
     /** @default 1.2 */
     scale?: number;
     /** @default 'png' */
-    outputFormat: "png" | "jpg" | "jpeg" | "webp";
+    outputFormat?: "png" | "jpg" | "jpeg" | "webp";
     pack?: boolean;
 }
 

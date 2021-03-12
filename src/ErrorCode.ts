@@ -23,4 +23,6 @@ export enum ErrorCode {
     RecordNotFound = 500000, // record info not found
 
     FileNotFound = 600000, // file info not found
+
+    AlreadyConverted = 700000, // convert task already finished
 }
