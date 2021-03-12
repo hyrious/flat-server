@@ -1,4 +1,5 @@
 import { FastifyRoutes } from "../../types/Server";
+import { convertFinish, convertFinishSchemaType } from "./convert/Finish";
 import { convertStart, convertStartSchemaType } from "./convert/Start";
 import { deleteFile, deleteFileSchemaType } from "./delete";
 import { list, listSchemaType } from "./list";
@@ -32,5 +33,13 @@ export const httpCloudStorage: Readonly<FastifyRoutes[]> = Object.freeze([
         handler: convertStart,
         auth: true,
         schema: convertStartSchemaType,
+    }),
+
+    Object.freeze({
+        method: "post",
+        path: "cloud-storage/convert",
+        handler: convertFinish,
+        auth: true,
+        schema: convertFinishSchemaType,
     }),
 ]);

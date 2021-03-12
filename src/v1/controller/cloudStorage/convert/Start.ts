@@ -5,6 +5,7 @@ import { CloudStorageFilesDAO, CloudStorageUserFilesDAO } from "../../../dao";
 import { FastifySchema, PatchRequest, Response } from "../../../types/Server";
 import { whiteboardCreateConversionTask } from "../../../utils/request/whiteboard/Whiteboard";
 import { ConvertStep } from "../Constants";
+import { isConverted, determineType } from "./Utils";
 
 export const convertStart = async (
     req: PatchRequest<{ Body: ConvertStartBody }>,
@@ -73,18 +74,6 @@ export const convertStart = async (
         };
     }
 };
-
-function determineType(resource: string): "static" | "dynamic" {
-    if (resource.endsWith(".pptx")) {
-        return "dynamic";
-    } else {
-        return "static";
-    }
-}
-
-function isConverted(convertStep: ConvertStep): boolean {
-    return convertStep === ConvertStep.Done || convertStep === ConvertStep.Failed;
-}
 
 interface ConvertStartBody {
     fileUUID: string;

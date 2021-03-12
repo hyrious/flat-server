@@ -25,4 +25,6 @@ export enum ErrorCode {
     FileNotFound = 600000, // file info not found
 
     AlreadyConverted = 700000, // convert task already finished
+    StillConverting, // convert task is not finished
+    ConvertFailed, // convert task is failed
 }
