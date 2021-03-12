@@ -1,6 +1,6 @@
 import { Column, Entity, Index } from "typeorm";
 import { Content } from "../Content";
-import { ConvertStep } from "../../controller/cloudStorage/Constants";
+import { FileConvertStep } from "../../controller/cloudStorage/Constants";
 
 @Entity({
     name: "cloud_storage_files",
@@ -35,16 +35,21 @@ export class CloudStorageFilesModel extends Content {
 
     @Column({
         type: "json",
-        comment: "convert result or null",
+        comment: "file convert result info",
     })
-    file_urls: string;
+    convert_result: string[];
 
     @Column({
         type: "enum",
-        enum: [ConvertStep.Pending, ConvertStep.Converting, ConvertStep.Done, ConvertStep.Failed],
-        default: ConvertStep.Pending,
+        enum: [
+            FileConvertStep.Pending,
+            FileConvertStep.Converting,
+            FileConvertStep.Done,
+            FileConvertStep.Failed,
+        ],
+        default: FileConvertStep.Pending,
     })
-    convert_step: ConvertStep;
+    convert_step: FileConvertStep;
 
     @Column({
         length: 40,
