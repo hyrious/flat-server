@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
+    "@types/ali-oss": "^6.0.7",
     "agora-access-token": "^2.0.4",
     "ajv": "^7.0.0-rc.5",
     "ali-oss": "^6.13.2",
