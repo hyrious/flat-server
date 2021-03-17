@@ -1,7 +1,11 @@
 import { getConnection } from "typeorm";
 import { Status } from "../../../../Constants";
 import { ErrorCode } from "../../../../ErrorCode";
-import { CloudStorageFilesDAO, CloudStorageUserDAO, CloudStorageUserFilesDAO } from "../../../dao";
+import {
+    CloudStorageFilesDAO,
+    CloudStorageConfigsDAO,
+    CloudStorageUserFilesDAO,
+} from "../../../dao";
 import { FastifySchema, PatchRequest, Response } from "../../../types/Server";
 
 export const deleteFile = async (
@@ -11,7 +15,7 @@ export const deleteFile = async (
     const { userUUID } = req.user;
 
     try {
-        const userInfo = await CloudStorageUserDAO().findOne(["total_usage"], {
+        const userInfo = await CloudStorageConfigsDAO().findOne(["total_usage"], {
             user_uuid: userUUID,
         });
 
@@ -54,7 +58,7 @@ export const deleteFile = async (
                 // TODO: tell oss to really delete files
 
                 commands.push(
-                    CloudStorageUserDAO(t).update(
+                    CloudStorageConfigsDAO(t).update(
                         {
                             total_usage: totalUsage.toString(),
                         },

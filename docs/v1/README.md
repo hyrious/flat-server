@@ -2,26 +2,50 @@
 POST agora/token/generate/rtc (generateRTC) [auth]
 body:
   interface GenerateRTCBody {
-      channelName: string;
-      uid: number;
       roomUUID: string;
   }
 results:
-  {
-      status: Status.Success,
-      data: {
-          token,
-      },
-  }
 
 POST agora/token/generate/rtm (generateRTM) [auth]
 results:
-  {
-      status: Status.Success,
-      data: {
-          token,
-      },
+
+POST cloud-storage/list (list) [auth]
+query:
+  interface ListQuery {
+      page: number;
+      is_delete?: number;
   }
+results:
+
+POST cloud-storage/rename (renameFile) [auth]
+body:
+  interface RenameFileBody {
+      fileUUID: string;
+      fileName: string;
+  }
+results:
+
+POST cloud-storage/delete (deleteFile) [auth]
+body:
+  interface DeleteFileBody {
+      fileUUID: string;
+      force?: boolean;
+  }
+results:
+
+POST cloud-storage/convert/start (convertStart) [auth]
+body:
+  interface ConvertStartBody {
+      fileUUID: string;
+  }
+results:
+
+POST cloud-storage/convert/finish (convertFinish) [auth]
+body:
+  interface ConvertFinishBody {
+      fileUUID: string;
+  }
+results:
 
 GET login/weChat/callback/:socketID (callback)
 params:
@@ -37,55 +61,21 @@ results:
 
 POST login (login) [auth]
 results:
-  {
-      status: Status.Failed,
-      message: "User does not exist",
-  }
-  {
-      status: Status.AuthFailed,
-      message: "The account token has expired, please log in again",
-  }
-  {
-      status: Status.AuthFailed,
-      message: (e as Error).message,
-  }
-  {
-      status: Status.Success,
-      data: {
-          name: userInfoInstance.user_name,
-          sex: userInfoInstance.sex,
-          avatar: userInfoInstance.avatar_url,
-          userUUID,
-      },
-  }
 
-POST room/create (create) [auth]
+POST room/create/ordinary (createOrdinary) [auth]
 body:
-  interface CreateBody {
+  interface CreateOrdinaryBody {
       title: string;
       type: RoomType;
       beginTime: number;
+      endTime?: number;
       docs?: Docs[];
   }
 results:
-  {
-      status: Status.Failed,
-      message: "Creation room time cannot be less than current time",
-  }
-  {
-      status: Status.Success,
-      data: {
-          roomUUID,
-      },
-  }
-  {
-      status: Status.Failed,
-      message: "Failed to create room",
-  }
 
-POST room/schedule (schedule) [auth]
+POST room/create/periodic (createPeriodic) [auth]
 body:
-  interface ScheduleBody {
+  interface CreatePeriodicBody {
       title: string;
       type: RoomType;
       beginTime: number;
@@ -94,28 +84,8 @@ body:
       docs?: Docs[];
   }
 results:
-  {
-      status: Status.Failed,
-      message: "Creation room time cannot be less than current time",
-  }
-  {
-      status: Status.Failed,
-      message: "The end time cannot be less than the creation time",
-  }
-  {
-      status: Status.Failed,
-      message:
-          "The interval between the start time and the end time must be greater than 15 minutes",
-  }
-  {
-      status: Status.Success,
-  }
-  {
-      status: Status.Failed,
-      message: "Failed to schedule room",
-  }
 
-GET room/list/:type (list) [auth]
+POST room/list/:type (list) [auth]
 params:
   interface ListParams {
       type: ListType;
@@ -125,131 +95,193 @@ query:
       page: number;
   }
 results:
-  {
-      status: Status.Success,
-      data: resp,
-  }
-  {
-      status: Status.Failed,
-      message: "Error in querying room list",
-  }
 
-POST room/join/ordinary (joinOrdinary) [auth]
+POST room/join (join) [auth]
 body:
-  interface JoinOrdinaryBody {
-      roomUUID: string;
+  interface JoinBody {
+      uuid: string;
   }
 results:
-  {
-      status: Status.Failed,
-      message: "Room not found",
-  }
-  {
-      status: Status.Failed,
-      message: "Room has been ended",
-  }
-  {
-      status: Status.Success,
-      data: {
-          whiteboardRoomToken: createWhiteboardRoomToken(roomInfo.whiteboard_room_uuid),
-          whiteboardRoomUUID: roomInfo.whiteboard_room_uuid,
-      },
-  }
-  {
-      status: Status.Failed,
-      message: "Join room failed",
-  }
 
-POST room/join/periodic (joinPeriodic) [auth]
+POST room/info/ordinary (ordinaryInfo) [auth]
 body:
-  interface JoinPeriodicBody {
+  interface OrdinaryInfoBody {
+      roomUUID: string;
+      needDocs: boolean;
+  }
+results:
+
+POST room/info/periodic (periodicInfo) [auth]
+body:
+  interface PeriodicInfoBody {
       periodicUUID: string;
   }
 results:
-  {
-      status: Status.Failed,
-      message: "Periodic room not found",
-  }
-  {
-      status: Status.Failed,
-      message: "Periodic has been ended",
-  }
-  {
-      status: Status.Failed,
-      message: "Room has ended or been deleted",
-  }
-  {
-      status: Status.Success,
-      data: {
-          roomUUID: roomInfo.room_uuid,
-          whiteboardRoomToken: createWhiteboardRoomToken(roomInfo.whiteboard_room_uuid),
-          whiteboardRoomUUID: roomInfo.whiteboard_room_uuid,
-      },
-  }
-  {
-      status: Status.Failed,
-      message: "Join room failed",
-  }
 
-POST room/users/info (userInfo) [auth]
+POST room/info/periodic-sub-room (periodicSubRoomInfo) [auth]
+body:
+  interface PeriodicSubRoomInfoBody {
+      roomUUID: string;
+      periodicUUID: string;
+      needOtherRoomTimeInfo?: boolean;
+  }
+results:
+
+POST room/info/users (userInfo) [auth]
 body:
   interface UserInfoBody {
       roomUUID: string;
+      usersUUID: string[];
   }
 results:
-  {
-      status: Status.Failed,
-      message: "Not have permission",
-  }
-  {
-      status: Status.Failed,
-      message: "Room not found",
-  }
-  {
-      status: Status.Success,
-      data: {
-          owner,
-          myself,
-          learners,
-      },
-  }
-  {
-      status: Status.Failed,
-      message: "Get room users info failed",
-  }
 
-POST room/info (roomInfo) [auth]
+POST room/update-status/started (started) [auth]
 body:
-  interface RoomInfoBody {
+  interface StartedBody {
       roomUUID: string;
-      queryDocs: boolean;
   }
 results:
-  {
-      status: Status.Failed,
-      message: "Not have permission",
+
+POST room/update-status/paused (paused) [auth]
+body:
+  interface PausedBody {
+      roomUUID: string;
   }
-  {
-      status: Status.Failed,
-      message: "Room not found",
+results:
+
+POST room/update-status/stopped (stopped) [auth]
+body:
+  interface StoppedBody {
+      roomUUID: string;
   }
-  {
-      status: Status.Success,
-      data: {
-          roomInfo: {
-              title: roomInfo.title,
-              beginTime: roomInfo.begin_time,
-              endTime: roomInfo.end_time,
-              roomType: roomInfo.room_type,
-              roomStatus: roomInfo.room_status,
-              creatorUserUUID: roomInfo.creator_user_uuid,
-          },
-          docs,
-      },
+results:
+
+POST room/update/ordinary (updateOrdinary) [auth]
+body:
+  interface UpdateOrdinaryBody {
+      roomUUID: string;
+      beginTime: number;
+      endTime: number;
+      title: string;
+      type: RoomType;
+      docs: Docs[];
   }
-  {
-      status: Status.Failed,
-      message: "get room info failed",
+results:
+
+POST room/update/periodic (updatePeriodic) [auth]
+body:
+  interface UpdatePeriodicBody {
+      periodicUUID: string;
+      beginTime: number;
+      endTime: number;
+      title: string;
+      type: RoomType;
+      periodic: Periodic;
+      docs: Docs[];
   }
+results:
+
+POST room/update/periodic-sub-room (updatePeriodicSubRoom) [auth]
+body:
+  interface UpdatePeriodicSubRoomBody {
+      periodicUUID: string;
+      roomUUID: string;
+      beginTime: number;
+      endTime: number;
+  }
+results:
+
+POST room/cancel/ordinary (cancelOrdinary) [auth]
+body:
+  interface CancelOrdinaryBody {
+      roomUUID: string;
+  }
+results:
+
+POST room/cancel/periodic (cancelPeriodic) [auth]
+body:
+  interface CancelPeriodicBody {
+      periodicUUID: string;
+  }
+results:
+
+POST room/cancel/periodic-sub-room (cancelPeriodicSubRoom) [auth]
+body:
+  interface CancelPeriodicSubRoomBody {
+      periodicUUID: string;
+      roomUUID: string;
+  }
+results:
+
+POST room/cancel/history (cancelHistory) [auth]
+body:
+  interface CancelHistoryBody {
+      roomUUID: string;
+  }
+results:
+
+POST room/record/started (recordStarted) [auth]
+body:
+  interface RecordStartedBody {
+      roomUUID: string;
+  }
+results:
+
+POST room/record/stopped (recordStopped) [auth]
+body:
+  interface RecordStoppedBody {
+      roomUUID: string;
+  }
+results:
+
+POST room/record/update-end-time (recordStopped) [auth]
+body:
+  interface RecordStoppedBody {
+      roomUUID: string;
+  }
+results:
+
+POST room/record/agora/acquire (recordAgoraAcquire) [auth]
+body:
+  interface RecordAgoraAcquireBody {
+      roomUUID: string;
+      agoraData: AgoraCloudRecordAcquireRequestBody;
+  }
+results:
+
+POST room/record/agora/started (recordAgoraStarted) [auth]
+body:
+  interface RecordAgoraStartedBody {
+      roomUUID: string;
+      agoraParams: AgoraCloudRecordParamsBaseType;
+      agoraData: AgoraCloudRecordStartedRequestBody;
+  }
+results:
+
+POST room/record/agora/query (recordAgoraQuery) [auth]
+body:
+  interface RecordAgoraQueryBody {
+      roomUUID: string;
+      agoraParams: AgoraCloudRecordParamsType;
+  }
+results:
+
+POST room/record/agora/update-layout (recordAgoraUpdateLayout) [auth]
+results:
+
+POST room/record/agora/stopped (recordAgoraStopped) [auth]
+body:
+  interface RecordAgoraStoppedBody {
+      roomUUID: string;
+      agoraParams: AgoraCloudRecordParamsType;
+  }
+results:
+
+POST room/record/info (recordInfo) [auth]
+body:
+  interface RecordInfoBody {
+      roomUUID: string;
+  }
+results:
 
 ```

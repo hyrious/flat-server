@@ -1,7 +1,7 @@
 import { createQueryBuilder } from "typeorm";
 import { Status } from "../../../../Constants";
 import { ErrorCode } from "../../../../ErrorCode";
-import { CloudStorageUserDAO } from "../../../dao";
+import { CloudStorageConfigsDAO } from "../../../dao";
 import { CloudStorageFilesModel } from "../../../model/cloudStorage/CloudStorageFiles";
 import { CloudStorageUserFilesModel } from "../../../model/cloudStorage/CloudStorageUserFiles";
 import { FastifySchema, PatchRequest, Response } from "../../../types/Server";
@@ -15,14 +15,14 @@ export const list = async (
     const is_delete = Boolean(req.query.is_delete).toString();
 
     try {
-        const userInfo = await CloudStorageUserDAO().findOne(["total_usage"], {
+        const userInfo = await CloudStorageConfigsDAO().findOne(["total_usage"], {
             user_uuid: req.user.userUUID,
         });
 
         if (userInfo === undefined) {
             return {
                 status: Status.Success,
-                data: { totalUsage: "0", files: [] },
+                data: { totalUsage: 0, files: [] },
             };
         }
 
@@ -66,7 +66,7 @@ export const list = async (
         return {
             status: Status.Success,
             data: {
-                totalUsage: userInfo.total_usage,
+                totalUsage: +userInfo.total_usage,
                 files: resp,
             },
         };
@@ -107,7 +107,7 @@ export const listSchemaType: FastifySchema<{
 };
 
 interface ListResponse {
-    totalUsage: string;
+    totalUsage: number;
     files: Array<{
         fileUUID: string;
         fileName: string;

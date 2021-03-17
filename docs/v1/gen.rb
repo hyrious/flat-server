@@ -46,6 +46,8 @@ def parse_req_res filename, code, handler, schema
   req = parse_req filename, code
   res = parse_res filename, code
   return req, res
+rescue
+  nil
 end
 
 def parse_req filename, code
@@ -94,12 +96,12 @@ def render_doc
   @routes.each do |meth, path, handler, auth, schema, req, res, filename|
     puts "#{meth} #{path} (#{handler})#{auth ? ' [auth]' : ''}"
     %i(params query body).each do |key|
-      if req[key]
+      if req && req[key]
         puts "#{key}:", indent(req[key])
       end
     end
     puts "results:"
-    res.uniq.each do |e|
+    res&.uniq&.each do |e|
       puts indent e
     end
     puts
