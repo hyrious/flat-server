@@ -21,9 +21,6 @@ declare namespace NodeJS {
         AGORA_OSS_FOLDER: string;
         AGORA_OSS_PREFIX: string;
 
-        OSS_ACCESS_KEY_ID: string;
-        OSS_ACCESS_KEY_SECRET: string;
-
         REDIS_HOST: string;
         REDIS_PORT: string;
         REDIS_PASSWORD: string;
@@ -49,5 +46,7 @@ declare namespace NodeJS {
         ALIBABA_CLOUD_OSS_OSS_ROLE_ARN: string;
         ALIBABA_CLOUD_OSS_POLICY: string;
         ALIBABA_CLOUD_OSS_SESSION_NAME: string;
+        ALIBABA_CLOUD_OSS_BUCKET: string;
+        ALIBABA_CLOUD_OSS_REGION: string;
     }
 }
