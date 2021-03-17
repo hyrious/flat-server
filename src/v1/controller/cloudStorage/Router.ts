@@ -29,15 +29,14 @@ export const httpCloudStorage: Readonly<FastifyRoutes[]> = Object.freeze([
     }),
     Object.freeze({
         method: "post",
-        path: "cloud-storage/convert",
+        path: "cloud-storage/convert/start",
         handler: convertStart,
         auth: true,
         schema: convertStartSchemaType,
     }),
-
     Object.freeze({
         method: "post",
-        path: "cloud-storage/convert",
+        path: "cloud-storage/convert/finish",
         handler: convertFinish,
         auth: true,
         schema: convertFinishSchemaType,
