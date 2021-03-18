@@ -23,8 +23,7 @@ export enum ErrorCode {
     RecordNotFound = 500000, // record info not found
 
     FileNotFound = 600000, // file info not found
+    FileExists, // file already exists
 
-    AlreadyConverted = 700000, // convert task already finished
-    StillConverting, // convert task is not finished
-    ConvertFailed, // convert task is failed
+    NotEnoughTotalUsage = 700000, // not enough TotalUsage
 }
