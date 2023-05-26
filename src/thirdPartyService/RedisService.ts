@@ -123,6 +123,18 @@ class RedisService {
         });
     }
 
+    public async mset(record: [key: string, value: string][], expire?: number): Promise<void> {
+        const commands: string[][] = [];
+        for (const [key, value] of record) {
+            if (expire) {
+                commands.push(["SET", key, value, "EX", String(expire)]);
+            } else {
+                commands.push(["SET", key, value]);
+            }
+        }
+        await this.client.multi(commands).exec();
+    }
+
     public async mget(keys: string[]): Promise<(string | null)[]> {
         if (keys.length === 0) {
             return [];

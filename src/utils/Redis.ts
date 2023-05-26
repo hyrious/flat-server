@@ -34,4 +34,6 @@ export const RedisKey = {
         `oauth:authorize:refreshToken:${refreshToken}`,
     oauthAuthorizeTokenByUserUUID: (clientID: string, userUUID: string) =>
         `oauth:authorize:clientID:${clientID}:user:${userUUID}`,
+    roomUserInfo: (roomUUID: string, userUUID: string): string =>
+        `room:user:${roomUUID}:${userUUID}`,
 };

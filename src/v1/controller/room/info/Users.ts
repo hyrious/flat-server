@@ -7,6 +7,9 @@ import { UserModel } from "../../../../model/user/User";
 import { Controller } from "../../../../decorator/Controller";
 import { AbstractController } from "../../../../abstract/controller";
 import { dataSource } from "../../../../thirdPartyService/TypeORMService";
+import RedisService from "../../../../thirdPartyService/RedisService";
+import { RedisKey } from "../../../../utils/Redis";
+import { parseError } from "../../../../logger";
 
 @Controller<RequestType, ResponseType>({
     method: "post",
@@ -38,6 +41,49 @@ export class UserInfo extends AbstractController<RequestType, ResponseType> {
 
     public async execute(): Promise<Response<ResponseType>> {
         const { roomUUID, usersUUID } = this.body;
+
+        // Cache one user info.
+        if (usersUUID && usersUUID.length === 1) {
+            try {
+                const cachedInfo = await RedisService.get(
+                    RedisKey.roomUserInfo(roomUUID, usersUUID[0]),
+                );
+
+                if (cachedInfo) {
+                    return {
+                        status: Status.Success,
+                        data: JSON.parse(cachedInfo),
+                    };
+                }
+            } catch (error) {
+                this.logger.error("get user info from cache failed", parseError(error));
+            }
+        }
+
+        const result = await this.fetchUsersInfo(roomUUID, usersUUID);
+
+        if (result.status === Status.Success) {
+            const record: [string, string][] = [];
+            for (const userUUID in result.data) {
+                const userInfo = result.data[userUUID];
+                const data = { [userUUID]: userInfo };
+                record.push([RedisKey.roomUserInfo(roomUUID, userUUID), JSON.stringify(data)]);
+            }
+            try {
+                const oneDay = 60 * 60 * 24;
+                await RedisService.mset(record, oneDay);
+            } catch (error) {
+                this.logger.error("cache user info failed", parseError(error));
+            }
+        }
+
+        return result;
+    }
+
+    private async fetchUsersInfo(
+        roomUUID: string,
+        usersUUID: string[] | undefined,
+    ): Promise<Response<ResponseType>> {
         const userUUID = this.userUUID;
 
         const roomUserInfo = await RoomUserDAO().findOne(["id"], {
