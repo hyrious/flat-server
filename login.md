@@ -78,7 +78,14 @@ POST /v2/user/password {password?,newPassword}
 
 `password` 为旧密码，可能没有旧密码 (前文返回的 `hasPassword`)。
 
-如果一个手机用户忘记了密码怎么办呢，这意味着这个接口必须允许不传入旧密码（毕竟已经登录了），这可能会导致一些安全隐患。
+注意：这里要求旧密码如果存在，必须填入来验证。
+
+### 忘记/重置密码
+
+```console
+POST /v2/reset/phone/sendMessage {phone}
+POST /v2/reset/phone {phone, code, password}
+```
 
 ## 增加 user_email 表用来邮箱注册/登录/修改密码/重置密码
 
@@ -101,9 +108,7 @@ POST /v2/register/email {email, code, password}
 POST /v2/login/email {email, password} => {userUUID, token, hasPhone: true}
 ```
 
-### 重置密码 (无 Auth 情况)
-
-这里用户一定没有手机号，否则他已经可以用验证码登录了。
+### 忘记/重置密码 (无 Auth 情况)
 
 ```console
 POST /v2/reset/email/sendMessage {email}
@@ -148,4 +153,4 @@ POST /v1/user/bindingPhone {phone, code} => {userUUID, token, hasPhone: true}
 
 ## 小计
 
-以上，一共新增了 1 张表、11 个新接口，修改了 4 个旧接口。
+以上，一共新增了 1 张表、13 个新接口，修改了 4 个旧接口。
