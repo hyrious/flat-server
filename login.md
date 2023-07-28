@@ -110,6 +110,19 @@ POST /v2/reset/email/sendMessage {email}
 POST /v2/reset/email {email, password}
 ```
 
+### 绑定邮箱 (需要 Auth)
+
+```console
+POST /v1/user/binding/email/sendMessage {email}
+POST /v1/user/binding/email {email, code}
+```
+
+### 解绑邮箱 (需要 Auth)
+
+```console
+POST /v1/user/binding/remove {target: "Email"}
+```
+
 ## 附加任务：第三方注册绑定手机号流程简化
 
 现在的流程是，后端登录成功的接口里有个 `hasPhone: boolean`，
@@ -135,4 +148,4 @@ POST /v1/user/bindingPhone {phone, code} => {userUUID, token, hasPhone: true}
 
 ## 小计
 
-以上，一共新增了 1 张表、9 个新接口，修改了 3 个旧接口。
+以上，一共新增了 1 张表、11 个新接口，修改了 4 个旧接口。
