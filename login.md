@@ -143,13 +143,14 @@ POST /v1/user/binding/remove {target: "Email"}
 
 实际上新的第三方号里面没有任何数据，可以把这个流程变为直接绑定这个第三方到现有账号上。
 
-可能的实现：绑定手机号接口现在是没有任何返回值的，可以让它返回旧账号的登录成功信息。
+可能的实现：前端询问用户是否合并账号，再发起一个请求将当前账号的第三方信息导入给现有账号，并删除当前账号。
 
 ```console
-POST /v1/user/bindingPhone {phone, code} => {userUUID, token, hasPhone: true}
+POST /v2/user/rebindPhone {phone} => {WeChat: 0, Github: 1, Google: -1}
+  -1 = 两个账号都没绑定过该平台
+   0 = 导入成功
+   1 = 导入失败，不能覆盖已经有的绑定
 ```
-
-新的前端在绑定成功后更新当前用户信息即可。
 
 ## 小计
 
