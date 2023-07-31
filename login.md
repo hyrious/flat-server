@@ -137,8 +137,8 @@ POST /v1/user/binding/remove {target: "Email"}
     跳到绑定手机页
 
 绑定手机页:
-    POST /v1/user/bindingPhone {phone, code} => Error: SMSAlreadyExist
-    报错为 “该手机在数据库中已存在”
+    POST /v1/user/bindingPhone {phone, code} => Error: SMSAlreadyBinding
+    报错为 “该手机在数据库中已被绑定”
 ```
 
 实际上新的第三方号里面没有任何数据，可以把这个流程变为直接绑定这个第三方到现有账号上。
