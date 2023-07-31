@@ -1,2 +1,2 @@
 set-env.sh
-local-storage.json
+local-storage*.json

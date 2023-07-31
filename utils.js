@@ -1,7 +1,7 @@
 export const sessionID = 'test-session-id'
 
 export const g = {
-  FLAT_SERVER_DOMAIN: 'flat-api-dev-sg.whiteboard.agora.io',
+  FLAT_SERVER_DOMAIN: process.env.DOMAIN || 'flat-api-dev-sg.whiteboard.agora.io',
 }
 g.FLAT_SERVER_BASE_URL_V1 = `https://${g.FLAT_SERVER_DOMAIN}/v1`
 g.FLAT_SERVER_BASE_URL_V2 = `https://${g.FLAT_SERVER_DOMAIN}/v2`
