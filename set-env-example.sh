@@ -3,3 +3,4 @@
 # . set-env.sh
 export PHONE=
 export DOMAIN=flat-api-dev-sg.whiteboard.agora.io
+export GITLAB_TOKEN=

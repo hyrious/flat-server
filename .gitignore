@@ -1,2 +1,4 @@
 set-env.sh
 local-storage*.json
+development.local.yaml
+development.yaml
