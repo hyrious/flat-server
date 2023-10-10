@@ -70,13 +70,6 @@ SET room:invite:{pmi} => room or periodic uuid
 SET room:inviteReverse:{uuid} => {pmi}
 ```
 
-#### 周期性房间
-
-```
-POST /v1/room/create/periodic { ..., pmi: true }
-=> {}
-```
-
 ## UI 设计
 
 - **加入房间**: 如果加入失败，
